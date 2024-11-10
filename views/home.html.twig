@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/public/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/public/assets/css/mystyles.css">
+</head>
+
+<body>
+    <div class="container mt-1">
+
+        <h1 class="text-center mb-2">Список пользователей</h1>
+        <!-- Таблица пользователей -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        <a
+                            href="/?sort=full_name&order={{ sortBy == 'full_name' and order == 'asc' ? 'desc' : 'asc' }}">Имя</a>
+                    </th>
+                    <th>
+                        <a href="/?sort=role&order={{ sortBy == 'role' and order == 'asc' ? 'desc' : 'asc' }}">Роль</a>
+                    </th>
+                    <th>
+                        <a
+                            href="/?sort=efficiency&order={{ sortBy == 'efficiency' and order == 'asc' ? 'desc' : 'asc' }}">Эффективность</a>
+                    </th>
+
+                    <th>
+                        <a
+                            href="/?sort=created_at&order={{ sortBy == 'created_at' and order == 'asc' ? 'desc' : 'asc' }}">Дата
+                            создания</a>
+                    </th>
+                    <th>
+
+                    </th>
+                    <th>
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user.efficiency }}</td>
+                    <td>{{ user.created_at|date('Y-m-d H:i') }}
+                    <td>
+                        <a href="#" class="delete-icon" onclick="confirmDelete({{ user.id }})">
+                            <img src="/public/assets/icons/trash.svg" alt="Delete" class="icon-trash">
+                        </a>
+                        <form id="delete-form-{{ user.id }}" action="/user/delete/{{ user.id }}" method="POST"
+                            style="display: none;">
+                            <input type="hidden" name="_method" value="POST">
+                        </form>
+                    </td>
+
+                    <td>
+                        <a href="/user/edit/{{ user.id }}" class="edit-icon">
+                            <img src="/public/assets/icons/pencil-fill.svg" alt="Edit" class="icon-pencil">
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">Нет данных для отображения</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Пагинация -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% for page in 1..totalPages %}
+                <li class="page-item {{ currentPage == page ? 'active' : '' }}">
+                    <a class="page-link" href="/?page={{ page }}&sort={{ sortBy }}&order={{ order }}">{{ page }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+
+    <script src="/public/assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmDelete(userId) {
+            if (confirm("Вы уверены, что хотите удалить этого пользователя?")) {
+                // Находим форму по ID и вызываем submit
+                document.getElementById(`delete-form-${userId}`).submit();
+            }
+        }
+    </script>
+</body>
+
+</html>

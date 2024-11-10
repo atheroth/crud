@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/public/assets/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-sm-12">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h3>Добавить пользователя</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="/user/create" method="POST">
+                            <div class="mb-3">
+                                <label for="full_name" class="form-label">Полное имя</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" maxlength="50"
+                                    oninput="this.value=this.value.slice(0,50)" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Роль</label>
+                                <select class="form-select" id="role" name="role" required>
+                                    <option value="admin">Администратор</option>
+                                    <option value="editor">Редактор</option>
+                                    <option value="viewer">Просмотр</option>
+                                    <option value="developer">Разработчик</option>
+                                    <option value="manager">Менеджер</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="efficiency" class="form-label">Эффективность</label>
+                                <input type="number" class="form-control" placeholder="максимум 999" id="efficiency"
+                                    name="efficiency" required min="0" maxlength="3"
+                                    oninput="this.value=this.value.slice(0,3)">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Добавить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/public/assets/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

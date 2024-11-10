@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/public/assets/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Редактировать пользователя</h1>
+        <form action="/user/{{ user.id }}" method="POST">
+            <div class="mb-3">
+                <label for="full_name" class="form-label">Полное имя</label>
+                <input type="text" class="form-control" id="full_name" name="full_name" value="{{ user.full_name }}"
+                    required>
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label">Роль</label>
+                <select class="form-select" id="role" name="role" required>
+                    <option value="admin" {{ user.role=='admin' ? 'selected' : '' }}>Администратор</option>
+                    <option value="editor" {{ user.role=='editor' ? 'selected' : '' }}>Редактор</option>
+                    <option value="viewer" {{ user.role=='viewer' ? 'selected' : '' }}>Просмотр</option>
+                    <option value="developer" {{ user.role=='developer' ? 'selected' : '' }}>Разработчик</option>
+                    <option value="manager" {{ user.role=='manager' ? 'selected' : '' }}>Менеджер</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="efficiency" class="form-label">Эффективность</label>
+                <input type="number" class="form-control" id="efficiency" name="efficiency"
+                    value="{{ user.efficiency }}" required min="0" max="100">
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить изменения</button>
+            <button type="button" class="btn btn-primary float-end" onclick="history.back()">Вернуться</button>
+        </form>
+
+
+    </div>
+    <script src="/public/assets/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Исключение для статических файлов (CSS, JS, изображения)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Все остальные запросы перенаправляются на index.php
+    RewriteRule ^ index.php [L]
+</IfModule>

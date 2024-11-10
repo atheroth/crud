@@ -1,0 +1,24 @@
+/* Базовый стиль для иконки */
+.icon-trash {
+    width: 24px;
+    height: 24px;
+    transition: filter 0.3s ease; /* Плавный переход */
+}
+
+/* Изменение цвета на красный при наведении */
+.delete-icon:hover .icon-trash {
+    filter: invert(19%) sepia(91%) saturate(7454%) hue-rotate(1deg) brightness(95%) contrast(122%);
+}
+
+
+/* Базовый стиль для иконки редактирования */
+.icon-pencil {
+    width: 24px;
+    height: 24px;
+    transition: filter 0.3s ease; /* Плавный переход */
+}
+
+/* Изменение цвета на синий при наведении */
+.edit-icon:hover .icon-pencil {
+    filter: invert(32%) sepia(58%) saturate(749%) hue-rotate(190deg) brightness(91%) contrast(92%);
+}
