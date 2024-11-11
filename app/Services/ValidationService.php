@@ -15,10 +15,14 @@ class ValidationService
 
     public function validateRole($value)
     {
-        $allowedRoles = ['admin', 'editor', 'viewer', 'developer', 'manager'];
-        $this->addError('role', Rules::required($value));
-        $this->addError('role', !in_array($value, $allowedRoles) ? 'Недопустимая роль.' : null);
+        $this->addError('role', Rules::required($value)); // Проверяем, что значение указано.
+
+        // Разрешаем буквы, цифры и пробелы, но не допускаем строки, состоящие только из цифр.
+        if (!preg_match('/^(?!\d+$)[a-zA-Z0-9\s]+$/u', $value)) {
+            $this->addError('role', 'Роль может содержать только буквы, цифры и пробелы, но не состоять из одних цифр.');
+        }
     }
+
 
     public function validateEfficiency($value)
     {

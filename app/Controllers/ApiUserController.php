@@ -13,7 +13,15 @@ class ApiUserController
     {
         $this->userModel = new User();
     }
-    // API Создать 
+
+    // Утилита для фильтрации полей в ответах
+    private function filterFields(array $user): array
+    {
+        unset($user['created_at'], $user['updated_at']);
+        return $user;
+    }
+
+    // API Создать
     public function create()
     {
         header('Content-Type: application/json');
@@ -42,7 +50,10 @@ class ApiUserController
             return;
         }
 
-        $id = $this->userModel->create($input);
+        $id = (int)$this->userModel->create($input);
+
+        // Преобразованием id в целое число
+        $id = (int) $id;
 
         http_response_code(201);
         echo json_encode(['success' => true, 'result' => ['id' => $id]], JSON_UNESCAPED_UNICODE);
@@ -53,57 +64,44 @@ class ApiUserController
     {
         header('Content-Type: application/json');
 
-        // Валидация ID
-        if (empty($id)) {
-            http_response_code(400); // Код ошибки: Bad Request
-            echo json_encode(['success' => false, 'error' => 'ID пользователя обязателен.'], JSON_UNESCAPED_UNICODE);
-            return;
-        }
-
-        if (!ctype_digit($id)) {
-            http_response_code(400); // Код ошибки: Bad Request
+        if (empty($id) || !ctype_digit($id)) {
+            http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'ID должен быть положительным числом.'], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        // Преобразование ID в целое число (дополнительная защита)
         $id = (int) $id;
-
-        // Получение пользователя из базы данных
         $user = $this->userModel->getById($id);
 
         if (!$user) {
-            http_response_code(404); // Код ошибки: Not Found
+            http_response_code(404);
             echo json_encode(['success' => false, 'error' => 'Пользователь не найден.'], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        // Успешный ответ
+        $user = $this->filterFields($user);
+
         http_response_code(200);
         echo json_encode(['success' => true, 'result' => ['user' => $user]], JSON_UNESCAPED_UNICODE);
     }
-
 
     // API UPDATE
     public function update($id)
     {
         header('Content-Type: application/json');
 
-        // Валидация ID
         if (!is_numeric($id) || $id <= 0) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Некорректный ID пользователя.'], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        // Проверка существования пользователя
         if (!$this->userModel->exists($id)) {
             http_response_code(404);
             echo json_encode(['success' => false, 'error' => 'Пользователь не найден.'], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        // Получение данных из тела запроса
         $input = json_decode(file_get_contents('php://input'), true);
 
         if (!$input || empty($input)) {
@@ -112,7 +110,6 @@ class ApiUserController
             return;
         }
 
-        // Допустимые поля для обновления
         $allowedFields = ['full_name', 'role', 'efficiency'];
         $updateFields = [];
 
@@ -128,7 +125,6 @@ class ApiUserController
             return;
         }
 
-        // Обновление пользователя
         $updated = $this->userModel->update($id, $updateFields);
 
         if (!$updated) {
@@ -137,7 +133,6 @@ class ApiUserController
             return;
         }
 
-        // Успешное обновление
         http_response_code(200);
         echo json_encode([
             'success' => true,
@@ -148,45 +143,32 @@ class ApiUserController
         ], JSON_UNESCAPED_UNICODE);
     }
 
-
-    // API /get 
+    // API получить список пользователей
     public function getAll()
     {
         header('Content-Type: application/json');
 
-        // Получение параметров запроса
-        $filters = [
-            'role' => $_GET['role'] ?? null,
-        ];
-        $sortBy = $_GET['sort_by'] ?? 'id'; // Поле сортировки, по умолчанию 'id'
-        $order = $_GET['order'] ?? 'asc';  // Направление сортировки, по умолчанию 'asc'
+        $filters = ['role' => $_GET['role'] ?? null];
+        $sortBy = $_GET['sort_by'] ?? 'id';
+        $order = $_GET['order'] ?? 'asc';
 
-        // Проверка направления сортировки
-        if (!in_array($order, ['asc', 'desc'])) {
+        if (!in_array($order, ['asc', 'desc']) || !in_array($sortBy, ['id', 'full_name', 'role', 'efficiency'])) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Invalid order parameter.'], JSON_UNESCAPED_UNICODE);
+            echo json_encode(['success' => false, 'error' => 'Некорректные параметры сортировки.'], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        // Проверка поля сортировки
-        $allowedSortFields = ['id', 'full_name', 'role', 'efficiency', 'created_at'];
-        if (!in_array($sortBy, $allowedSortFields)) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Invalid sort_by parameter.'], JSON_UNESCAPED_UNICODE);
-            return;
-        }
-
-        // Получение пользователей с фильтрацией и сортировкой
         $users = $this->userModel->getFilteredAndSorted($filters, $sortBy, $order);
 
         if (empty($users)) {
             http_response_code(404);
-            echo json_encode(['success' => false, 'error' => 'No users found.'], JSON_UNESCAPED_UNICODE);
+            echo json_encode(['success' => false, 'error' => 'Пользователи не найдены.'], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        // Возврат данных
-        echo json_encode(['success' => true, 'result' => ['users' => $users]], JSON_UNESCAPED_UNICODE);
+        $filteredUsers = array_map([$this, 'filterFields'], $users);
+
+        echo json_encode(['success' => true, 'result' => ['users' => $filteredUsers]], JSON_UNESCAPED_UNICODE);
     }
 
     // API DELETE
@@ -194,22 +176,19 @@ class ApiUserController
     {
         header('Content-Type: application/json');
 
-        // Валидация ID
         if (!is_numeric($id) || $id <= 0) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Некорректный ID пользователя.'], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        // Проверка существования пользователя
         if (!$this->userModel->exists($id)) {
             http_response_code(404);
             echo json_encode(['success' => false, 'error' => 'Пользователь с указанным ID не найден.'], JSON_UNESCAPED_UNICODE);
             return;
         }
 
-        // Удаление пользователя
-        $deletedUser = $this->userModel->getById($id); // Получаем данные пользователя перед удалением
+        $deletedUser = $this->userModel->getById($id);
         $deleted = $this->userModel->delete($id);
 
         if (!$deleted) {
@@ -218,16 +197,12 @@ class ApiUserController
             return;
         }
 
-        // Успешное удаление
+        $deletedUser = $this->filterFields($deletedUser);
+
         http_response_code(200);
         echo json_encode([
             'success' => true,
-            'result' => [
-                'id' => $deletedUser['id'],
-                'full_name' => $deletedUser['full_name'],
-                'role' => $deletedUser['role'],
-                'efficiency' => $deletedUser['efficiency']
-            ]
+            'result' => $deletedUser
         ], JSON_UNESCAPED_UNICODE);
     }
 }
