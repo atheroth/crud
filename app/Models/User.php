@@ -164,10 +164,11 @@ class User
     }
 
     //Метод для очистки пользователей 
-    public function deleteAll()
+    public function deleteAll(): bool
     {
         $sql = "DELETE FROM users";
         $stmt = $this->db->prepare($sql);
+
         return $stmt->execute();
     }
 }

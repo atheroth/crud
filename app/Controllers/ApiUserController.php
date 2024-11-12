@@ -172,26 +172,10 @@ class ApiUserController
     }
 
     // API DELETE
-    public function delete($id = null)
+    public function delete($id)
     {
         header('Content-Type: application/json');
 
-        // Если ID не передан, удаляем всех пользователей
-        if (is_null($id)) {
-            $deleted = $this->userModel->deleteAll();
-
-            if (!$deleted) {
-                http_response_code(500);
-                echo json_encode(['success' => false, 'error' => 'Не удалось удалить всех пользователей.'], JSON_UNESCAPED_UNICODE);
-                return;
-            }
-
-            http_response_code(200);
-            echo json_encode(['success' => true], JSON_UNESCAPED_UNICODE);
-            return;
-        }
-
-        // Если ID передан, проверяем его валидность
         if (!is_numeric($id) || $id <= 0) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Некорректный ID пользователя.'], JSON_UNESCAPED_UNICODE);
@@ -204,7 +188,6 @@ class ApiUserController
             return;
         }
 
-        // Удаление пользователя
         $deletedUser = $this->userModel->getById($id);
         $deleted = $this->userModel->delete($id);
 
@@ -221,5 +204,24 @@ class ApiUserController
             'success' => true,
             'result' => $deletedUser
         ], JSON_UNESCAPED_UNICODE);
+    }
+
+    // API DELETE ALL
+    public function deleteAll()
+    {
+        header('Content-Type: application/json');
+
+        // Удаляем всех пользователей
+        $deleted = $this->userModel->deleteAll();
+
+        if (!$deleted) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Не удалось удалить пользователей.'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        // Успешное удаление
+        http_response_code(200);
+        echo json_encode(['success' => true], JSON_UNESCAPED_UNICODE);
     }
 }
