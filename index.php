@@ -38,7 +38,7 @@ $dispatcher = FastRoute\simpleDispatcher(function (RouteCollector $r) {
     $r->addRoute('GET', '/api/get', 'ApiUserController@getAll');       // Получение всех пользователей
     $r->addRoute('GET', '/api/get/{id:\d+}', 'ApiUserController@get'); // Получение пользователя по ID
     $r->addRoute('PATCH', '/api/update/{id:\d+}', 'ApiUserController@update'); // Обновление пользователя
-    $r->addRoute('DELETE', '/api/delete/{id:\d+}', 'ApiUserController@delete'); // Удаление пользователя по ID
+    $r->addRoute('DELETE', '/api/delete/{id:\d+}', 'ApiUserController@delete'); // Удаление пользователя по ID $r->addRoute('DELETE', '/api/delete/{id:\d+}', 'ApiUserController@delete'); // Удаление пользователя по ID
 });
 
 // Обработка маршрутов

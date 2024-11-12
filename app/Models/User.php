@@ -162,4 +162,12 @@ class User
 
         return $stmt->fetchColumn() > 0; // Вернет true, если запись существует
     }
+
+    //Метод для очистки пользователей 
+    public function deleteAll()
+    {
+        $sql = "DELETE FROM users";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute();
+    }
 }
